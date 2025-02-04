@@ -1,5 +1,5 @@
 import streamlit as st
-from database import add_member, update_member, fetch_member_by_id
+from database import add_member, update_member, update_status
 
 # Initialize session state for page navigation if not already set
 if "page" not in st.session_state:
@@ -47,9 +47,17 @@ def update_details_btn(id, number, email, membership_type):
     else:
         st.error("All fields are required!")
 
-def act_deact_btn():
-    st.success("Membership status updated successfully!")
-    st.session_state.page = 'home'
+def act_deact_btn(id, act_deact):
+    if id and act_deact:
+        update_status_info = {
+            "id": id,
+            "act_deact": act_deact 
+        }
+        update_status(update_status_info)
+        st.success("Membership status updated successfully!")
+        st.session_state.page = 'home'
+    else:
+        st.error("All fields are required!")
 
 def show_page(page):
     if page == "home":
@@ -95,11 +103,12 @@ def show_page(page):
 
     elif page == "activate_deactivate_mem":
         st.title("Activate/Deactivate Membership")
+        id = st.text_input("Enter Member ID")
         act_deact = st.selectbox("Activate/Deactivate", ["Activate", "Deactivate"], index=0)
         col1, col2 = st.columns(2)
         with col1:
             st.button("Home", on_click=go_to_home)
         with col2:
-            st.button("Update", on_click=act_deact_btn)
+            st.button("Update", on_click=act_deact_btn, args=(id, act_deact))
 
 show_page(st.session_state.page)

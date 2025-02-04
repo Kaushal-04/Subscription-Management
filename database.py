@@ -28,6 +28,7 @@ def create_table():
                 mobile VARCHAR(10) NOT NULL,
                 email VARCHAR(50),
                 mem_type VARCHAR(10) CHECK (mem_type IN ('Monthly', 'Quarterly', 'Yearly')),
+                status VARCHAR(10) CHECK (status IN ('Activate', 'Deactivate')) DEFAULT 'Activate',
                 start_date DATE DEFAULT CURRENT_DATE,
                 end_date DATE
             )
@@ -73,6 +74,24 @@ def update_member(update_info):
                         WHERE mem_id = %s'''
         
         cur.execute(mem_update, (update_info["mobile"], update_info["email"], update_info["mem_type"], update_info["id"]))
+        conn.commit()
+        cur.close()
+        conn.close()
+        print("Member updated successfully.")
+    except Exception as e:
+        conn.rollback()
+        print(f"Error updating member: {e}")
+
+def update_status(update_status_info):
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            return
+        cur = conn.cursor()
+        update_sta = '''UPDATE member 
+                        SET status = %s
+                        WHERE mem_id = %s'''
+        cur.execute(update_sta, (update_status_info["act_deact"], update_status_info["id"]))
         conn.commit()
         cur.close()
         conn.close()
