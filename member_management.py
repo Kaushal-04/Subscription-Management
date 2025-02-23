@@ -1,6 +1,7 @@
 import streamlit as st
 from database import add_member, update_member, update_status
-from app import validate_user_inputs
+from app import validate_user_new
+from app import validate_user_update
 
 # Initialize session state for page navigation if not already set
 if "page" not in st.session_state:
@@ -28,13 +29,13 @@ def register_btn(name, number, email, membership_type, start_date, end_date):
             "start_date": start_date,
             "end_date": end_date
         }
-        validation_result = validate_user_inputs(mem_info)
-        if validation_result is True:
+        validation_result_new = validate_user_new(mem_info)
+        if validation_result_new is True:
             add_member(mem_info)
             st.success("Registration Successful!")
             st.session_state.page = "home"
         else:
-            st.error(validation_result)
+            st.error(validation_result_new)
     else:
         st.error("All fields are required.")
 
@@ -46,9 +47,13 @@ def update_details_btn(id, number, email, membership_type):
             "email": email,
             "mem_type": membership_type
         }
-        update_member(update_info)
-        st.success("Details updated successfully!")
-        st.session_state.page = "home"
+        validate_result_update = validate_user_update(update_info)
+        if validate_result_update is True:
+            update_member(update_info)
+            st.success("Details updated successfully!")
+            st.session_state.page = "home"
+        else:
+            st.error(validate_result_update)
     else:
         st.error("All fields are required!")
 
