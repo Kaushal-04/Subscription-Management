@@ -1,5 +1,6 @@
 import psycopg2
 from psycopg2 import sql
+import pandas as pd
 
 def get_db_connection():
     try:
@@ -108,9 +109,11 @@ def fetch_all_members():
         cur = conn.cursor()
         cur.execute('SELECT * FROM member')
         records = cur.fetchall()
+        columns = [desc[0] for desc in cur.description]
+        df = pd.DataFrame(records, columns=columns)
         cur.close()
         conn.close()
-        return records
+        return df
     except Exception as e:
         print(f"Error fetching members: {e}")
         return []
@@ -129,6 +132,7 @@ def fetch_member_by_id(mem_id):
     except Exception as e:
         print(f"Error fetching member by ID: {e}")
         return None
+    
 
 # Initialize Database
 create_table()

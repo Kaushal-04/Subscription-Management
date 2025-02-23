@@ -1,7 +1,8 @@
 import streamlit as st
-from database import add_member, update_member, update_status
+from database import add_member, update_member, update_status, fetch_all_members
 from app import validate_user_new
 from app import validate_user_update
+import time
 
 # Initialize session state for page navigation if not already set
 if "page" not in st.session_state:
@@ -18,6 +19,12 @@ def go_to_home():
 
 def go_to_manage_membership():
     st.session_state.page = "activate_deactivate_mem"
+
+def all_members():
+    st.session_state.page = "member_view"
+
+def go_to_member_data():
+    st.session_state.page = "show_member_data"
 
 def register_btn(name, number, email, membership_type, start_date, end_date):
     if name and number and email and membership_type and start_date and end_date:
@@ -69,12 +76,16 @@ def act_deact_btn(id, act_deact):
     else:
         st.error("All fields are required!")
 
+def view_members():
+    go_to_member_data()
+
 def show_page(page):
     if page == "home":
         st.write("# Managing Memberships or Subscriptions")
         st.button("Register New Member", on_click=go_to_new_member)
         st.button("Update Details", on_click=go_to_update)
         st.button("Manage Membership", on_click=go_to_manage_membership)
+        st.button("View Registered Members", on_click=all_members)
 
     elif page == "new_member_details":
         st.title("New Member Registration")
@@ -120,5 +131,19 @@ def show_page(page):
             st.button("Home", on_click=go_to_home)
         with col2:
             st.button("Update", on_click=act_deact_btn, args=(id, act_deact))
+
+    elif page == "member_view":
+        st.title("Registered Members Details")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.button("Home", on_click=go_to_home)
+        with col2:
+            st.button("View Member", on_click=view_members)
+            
+    elif page == "show_member_data":
+        st.title("Members List")
+        st.button("Home", on_click=go_to_home)
+        data = fetch_all_members()
+        st.write(data)
 
 show_page(st.session_state.page)
